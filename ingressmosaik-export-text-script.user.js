@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         IngressMosaik Export Text Script
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.2.1
 // @description  Export IngressMosaik mission list as text script
 // @author       sspp0000xx
 // @match        https://ingressmosaik.com/mosaic/*
@@ -100,8 +100,13 @@
     function ready() {
         GM_registerMenuCommand("IngressMosaik: Append text script", () => {
             let missions = getMissions();
+
+            let allActions = missions.reduce((all,m) => ([ ...all, ...m.actions ]), []);
+            let allDirectionsLink = makeGoogleDirectionsLink({ actions: allActions });
+
             let source = `
 <div class="dump">
+<!--<p><a href="{{directionsUrl}}">Directions (complete banner, {{numActions}} actions)</a></p>-->
 {{#each missions}}
   <h3>{{name}}</h1>
   <p>{{description}} (<a href="{{directionsUrl}}">Directions</a>)</p>
@@ -114,7 +119,7 @@
 </div>
 `;
             let tpl = Handlebars.compile(source);
-            let html = tpl({ missions: missions });
+            let html = tpl({ missions: missions, directionsUrl: allDirectionsLink, numActions: allActions.length });
             let div = document.createElement("div");
             div.innerHTML = html;
             document.body.appendChild(div);
