@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         IngressMosaik Export Text Script
 // @namespace    http://tampermonkey.net/
-// @version      0.2.2
+// @version      0.2.4
 // @description  Export IngressMosaik mission list as text script
 // @author       sspp0000xx
 // @downloadURL  https://github.com/sp00x/tampermonkey-ingressmosaik-export-mission-text-script/raw/master/ingressmosaik-export-text-script.user.js
@@ -72,6 +72,7 @@
     }
 
     function makeGoogleDirectionsLink(m) {
+        console.log("steps = " + m.actions.length);
         let u = "https://www.google.com/maps/dir/?api=1&travelmode=walking";
         let a = [ ...m.actions ];
         let first = a.shift();
@@ -91,7 +92,20 @@
 
         let missions = jsonMissions.map((m,i) => {
             m.description = tableMissions[i].description;
-            m.directionsUrl = makeGoogleDirectionsLink(m);
+            m.directions = [];
+            const maxWaypoints = 10;
+            console.log("#", m.actions.length);
+            for (let j = 1; m.actions.length >= j; j += maxWaypoints) {
+                let from = j;
+                let to = Math.min(j + maxWaypoints, m.actions.length);
+                console.log(from, to);
+                if (to > from) {
+                    m.directions.push({
+                        title: `${from}-${to}`,
+                        url: makeGoogleDirectionsLink({ actions: m.actions.slice(from-1, to) })
+                    })
+                }
+            }
             return m;
         });
 
@@ -110,7 +124,7 @@
 <!--<p><a href="{{directionsUrl}}">Directions (complete banner, {{numActions}} actions)</a></p>-->
 {{#each missions}}
   <h3>{{name}}</h1>
-  <p>{{description}} (<a href="{{directionsUrl}}">Directions</a>)</p>
+  <p>{{description}} (Directions:{{#each directions}} <a href="{{url}}">{{title}}</a>{{/each}})</p>
   <ol>
 {{#each actions}}
     <li><a href="https://intel.ingress.com/intel?ll={{lat}},{{lng}}&pll={{lat}},{{lng}}&z=16">{{name}}</a> ({{action}})</li>
