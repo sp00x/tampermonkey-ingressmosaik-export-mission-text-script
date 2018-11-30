@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name         IngressMosaik Export Text Script
 // @namespace    http://tampermonkey.net/
-// @version      0.2.1
+// @version      0.2.2
 // @description  Export IngressMosaik mission list as text script
 // @author       sspp0000xx
+// @downloadURL  https://github.com/sp00x/tampermonkey-ingressmosaik-export-mission-text-script/raw/master/ingressmosaik-export-text-script.user.js
 // @match        https://ingressmosaik.com/mosaic/*
 // @include      https://ingressmosaik.com/mosaic/*
 // @grant        GM_registerMenuCommand
